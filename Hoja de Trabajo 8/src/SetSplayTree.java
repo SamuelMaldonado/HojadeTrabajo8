@@ -1,195 +1,182 @@
-public class SetSplayTree<Key extends Comparable<Key>, Value>  {
 
-    private Node root;   // root of the BST
 
-    // BST helper node data type
-    private class Node {
-        private Key key;            // key
-        private Value value;        // associated data
-        private Node left, right;   // left and right subtrees
+    // SplayTree class
+    //
+    // CONSTRUCTION: with no initializer
+    //
+    // ******************PUBLIC OPERATIONS*********************
+    // void insert( x )       --> Insert x
+    // void remove( x )       --> Remove x
+    // Comparable find( x )   --> Return item that matches x
+    // Comparable findMin( )  --> Return smallest item
+    // Comparable findMax( )  --> Return largest item
+    // boolean isEmpty( )     --> Return true if empty; else false
+    // void makeEmpty( )      --> Remove all items
+    // void printTree( )      --> Print tree in sorted order
 
-        public Node(Key key, Value value) {
-            this.key   = key;
-            this.value = value;
-        }
-    }
-
-    public boolean contains(Key key) {
-        return (get(key) != null);
-    }
-
-    // return value associated with the given key
-    // if no such value, return null
-    public Value get(Key key) {
-        root = splay(root, key);
-        int cmp = key.compareTo(root.key);
-        if (cmp == 0) return root.value;
-        else          return null;
-    }    
-
-   /*************************************************************************
-    *  splay insertion
-    *************************************************************************/
-    public void put(Key key, Value value) {
-        // splay key to root
-        if (root == null) {
-            root = new Node(key, value);
-            return;
-        }
-        
-        root = splay(root, key);
-
-        int cmp = key.compareTo(root.key);
-        
-        // Insert new node at root
-        if (cmp < 0) {
-            Node n = new Node(key, value);
-            n.left = root.left;
-            n.right = root;
-            root.left = null;
-            root = n;
-        }
-
-        // Insert new node at root
-        else if (cmp > 0) {
-            Node n = new Node(key, value);
-            n.right = root.right;
-            n.left = root;
-            root.right = null;
-            root = n;
-        }
-
-        // It was a duplicate key. Simply replace the value
-        else if (cmp == 0) {
-            root.value = value;
-        }
-
-    }
-    
-   /*************************************************************************
-    *  splay deletion
-    *************************************************************************/    
-    /* This splays the key, then does a slightly modified Hibbard deletion on
-     * the root (if it is the node to be deleted; if it is not, the key was 
-     * not in the tree). The modification is that rather than swapping the
-     * root (call it node A) with its successor, it's successor (call it Node B)
-     * is moved to the root position by splaying for the deletion key in A's 
-     * right subtree. Finally, A's right child is made the new root's right 
-     * child.
+    /**
+     * Implements a top-down splay tree.
+     * Note that all "matching" is based on the compareTo method.
+     * @author Mark Allen Weiss
      */
-    public void remove(Key key) {
-        if (root == null) return; // empty tree
+    public class SetSplayTree
+    {
+    	private static BinaryNode newNode = null;
+    	private static BinaryNode nullNode;
+    	private static BinaryNode header = new BinaryNode(null);
+    	private BinaryNode root;
+        /**
+         * Construct the tree.
+         */
+        public SetSplayTree( )
+        {
+            root = nullNode;
+            nullNode.left = nullNode;
+            nullNode.right = nullNode;
+            nullNode = new BinaryNode(null);
+        }
+
+        /**
+         * Insert into the tree.
+         * @param x the item to insert.
+         */
+        public void insert( Comparable x )
+        {
+            if( newNode == null )
+                newNode = new BinaryNode( null );
+            newNode.element = x;
+
+            if( root == nullNode )
+            {
+                newNode.left = newNode.right = nullNode;
+                root = newNode;
+            }
+            else
+            {
+                root = splay( x, root );
+                if( x.compareTo( root.element ) < 0 )
+                {
+                    newNode.left = root.left;
+                    newNode.right = root;
+                    root.left = nullNode;
+                    root = newNode;
+                }
+                else
+                if( x.compareTo( root.element ) > 0 )
+                {
+                    newNode.right = root.right;
+                    newNode.left = root;
+                    root.right = nullNode;
+                    root = newNode;
+                }
+                else
+                    return;
+            }
+            newNode = null;   // So next insert will call new
+        }
+
+
+
+        /**
+         * Find an item in the tree.
+         * @param x the item to search for.
+         * @return the matching item or null if not found.
+         */
+        public Comparable find( Comparable x )
+        {
+            root = splay( x, root );
+
+            if( isEmpty( ) || root.element.compareTo( x ) != 0 )
+                return null;
+
+            return root.element;
+        }
+
+        /**
+         * Test if the tree is logically empty.
+         * @return true if empty, false otherwise.
+         */
+        public boolean isEmpty( )
+        {
+            return root == nullNode;
+        }
         
-        root = splay(root, key);
+        private BinaryNode splay( Comparable x, BinaryNode t )
+        {
+            BinaryNode leftTreeMax, rightTreeMin;
 
-        int cmp = key.compareTo(root.key);
-        
-        if (cmp == 0) {
-            if (root.left == null) {
-                root = root.right;
-            } 
-            else {
-                Node x = root.right;
-                root = root.left;
-                splay(root, key);
-                root.right = x;
-            }
+            header.left = header.right = nullNode;
+            leftTreeMax = rightTreeMin = header;
+
+            nullNode.element = x;   // Guarantee a match
+
+            for( ; ; )
+                if( x.compareTo( t.element ) < 0 )
+                {
+                    if( x.compareTo( t.left.element ) < 0 )
+                        t = rotateWithLeftChild( t );
+                    if( t.left == nullNode )
+                        break;
+                    // Link Right
+                    rightTreeMin.left = t;
+                    rightTreeMin = t;
+                    t = t.left;
+                }
+                else if( x.compareTo( t.element ) > 0 )
+                {
+                    if( x.compareTo( t.right.element ) > 0 )
+                        t = rotateWithRightChild( t );
+                    if( t.right == nullNode )
+                        break;
+                    // Link Left
+                    leftTreeMax.right = t;
+                    leftTreeMax = t;
+                    t = t.right;
+                }
+                else
+                    break;
+
+            leftTreeMax.right = t.left;
+            rightTreeMin.left = t.right;
+            t.left = header.right;
+            t.right = header.left;
+            return t;
         }
 
-        // else: it wasn't in the tree to remove
-    }
-    
-    
-   /************************************************************************
-    * splay function
-    * **********************************************************************/
-    // splay key in the tree rooted at Node h. If a node with that key exists,
-    //   it is splayed to the root of the tree. If it does not, the last node
-    //   along the search path for the key is splayed to the root.
-    private Node splay(Node h, Key key) {
-        if (h == null) return null;
-
-        int cmp1 = key.compareTo(h.key);
-
-        if (cmp1 < 0) {
-            // key not in tree, so we're done
-            if (h.left == null) {
-                return h;
-            }
-            int cmp2 = key.compareTo(h.left.key);
-            if (cmp2 < 0) {
-                h.left.left = splay(h.left.left, key);
-                h = rotateRight(h);
-            }
-            else if (cmp2 > 0) {
-                h.left.right = splay(h.left.right, key);
-                if (h.left.right != null)
-                    h.left = rotateLeft(h.left);
-            }
-            
-            if (h.left == null) return h;
-            else                return rotateRight(h);
+        /**
+         * Rotate binary tree node with left child.
+         */
+        static BinaryNode rotateWithLeftChild( BinaryNode k2 )
+        {
+            BinaryNode k1 = k2.left;
+            k2.left = k1.right;
+            k1.right = k2;
+            return k1;
         }
 
-        else if (cmp1 > 0) { 
-            // key not in tree, so we're done
-            if (h.right == null) {
-                return h;
-            }
-
-            int cmp2 = key.compareTo(h.right.key);
-            if (cmp2 < 0) {
-                h.right.left  = splay(h.right.left, key);
-                if (h.right.left != null)
-                    h.right = rotateRight(h.right);
-            }
-            else if (cmp2 > 0) {
-                h.right.right = splay(h.right.right, key);
-                h = rotateLeft(h);
-            }
-            
-            if (h.right == null) return h;
-            else                 return rotateLeft(h);
+        /**
+         * Rotate binary tree node with right child.
+         */
+        static BinaryNode rotateWithRightChild( BinaryNode k1 )
+        {
+            BinaryNode k2 = k1.right;
+            k1.right = k2.left;
+            k2.left = k1;
+            return k2;
         }
 
-        else return h;
+        /**
+         * Internal method to print a subtree in sorted order.
+         * WARNING: This is prone to running out of stack space.
+         * @param t the node that roots the tree.
+         */
+        private void printTree( BinaryNode t )
+        {
+            if( t != t.left )
+            {
+                printTree( t.left );
+                System.out.println( t.element.toString( ) );
+                printTree( t.right );
+            }
+        }
     }
-
-
-   /*************************************************************************
-    *  helper functions
-    *************************************************************************/
-
-    // height of tree (1-node tree has height 0)
-    public int height() { return height(root); }
-    private int height(Node x) {
-        if (x == null) return -1;
-        return 1 + Math.max(height(x.left), height(x.right));
-    }
-
-    
-    public int size() {
-        return size(root);
-    }
-    
-    private int size(Node x) {
-        if (x == null) return 0;
-        else return (1 + size(x.left) + size(x.right));
-    }
-    
-    // right rotate
-    private Node rotateRight(Node h) {
-        Node x = h.left;
-        h.left = x.right;
-        x.right = h;
-        return x;
-    }
-
-    // left rotate
-    private Node rotateLeft(Node h) {
-        Node x = h.right;
-        h.right = x.left;
-        x.left = h;
-        return x;
-    }
-}

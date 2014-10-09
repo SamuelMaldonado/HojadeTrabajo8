@@ -1,24 +1,23 @@
-import java.util.ArrayList;
+
 
 public class SplayTree implements WordSet{
 
-	private ArrayList<Word> base;
+	private SetSplayTree base;
 	
 	public SplayTree(){
-		base = new ArrayList<Word>();
+		base = new SetSplayTree();
 	}
 	
 	
 	public void add(Word wordObject) {
-		base.add(wordObject);
+		base.insert(wordObject);
 		
 	}
 
 	
 	public Word get(Word word) {
-		int index = base.indexOf(word);
-		if(index == -1) return null;
-		return base.get(index);
+
+		return (Word)base.find(word);
 	}
 
 }
