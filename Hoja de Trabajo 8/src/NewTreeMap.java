@@ -26,3 +26,5 @@ public class NewTreeMap implements WordSet{
             nuevo.put(wordObject.getWord(),wordObject);
         }
 }
+//http://tutorialswithexamples.com/java-treemap-tutorial-and-examples/
+//http://www.tutorialspoint.com/java/java_treemap_class.htm
