@@ -36,3 +36,7 @@ class HashTable implements WordSet{
        
 
 }
+// http://jarroba.com/map-en-java-con-ejemplos/
+//http://www.tutorialspoint.com/java/java_hashtable_class.htm     
+//http://www.tutorialspoint.com/java/util/hashtable_put.htm
+
