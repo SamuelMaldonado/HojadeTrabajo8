@@ -236,4 +236,10 @@ public class RBT implements WordSet{
    
 }
 //Fuentes: http://www.link.cs.cmu.edu/splay/
-
+//http://www.java-tips.org/java-se-tips/java.lang/red-black-tree-implementation-in-java.html
+//http://en.literateprograms.org/Red-black_tree_%28Java%29
+//https://github.com/naishe/algo/blob/master/src/main/java/in/naishe/algo/tree/RedBlackTree.java
+//https://weblogs.java.net/blog/cayhorstmann/archive/2011/05/12/easy-red-black-trees
+//http://www.sanfoundry.com/java-program-implement-red-black-tree/
+//http://cs.lmu.edu/~ray/notes/redblacktrees/
+//http://stackoverflow.com/questions/3339778/red-black-tree-how-to-rotate-if-root-is-the-grandparent
