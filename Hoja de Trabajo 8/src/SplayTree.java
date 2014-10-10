@@ -101,3 +101,4 @@ class BinaryNode
     BinaryNode left;
     BinaryNode right;
 }
+//FUentes: http://www.link.cs.cmu.edu/splay/
