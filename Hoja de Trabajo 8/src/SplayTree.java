@@ -102,3 +102,6 @@ class BinaryNode
     BinaryNode right;
 }
 //FUentes: http://www.link.cs.cmu.edu/splay/
+//Josh Israel 
+//http://www.sanfoundry.com/java-program-implement-splay-tree/
+//http://codereview.stackexchange.com/questions/12195/splay-tree-implementation
