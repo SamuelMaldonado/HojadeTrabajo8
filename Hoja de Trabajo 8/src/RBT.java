@@ -235,4 +235,5 @@ public class RBT implements WordSet{
 
    
 }
+//Fuentes: http://www.link.cs.cmu.edu/splay/
 
